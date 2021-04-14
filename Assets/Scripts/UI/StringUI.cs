@@ -6,26 +6,18 @@ using TMPro;
 
 
 
-public class TextUI : MonoBehaviour
+public class StringUI : MonoBehaviour
 {
-    public TMP_Text text = null;
+    public Text text = null;
     public StringData data = null;
-
 
     private void OnValidate()
     {
         if (data != null)
         {
             name = data.name;
-            //label.text = name;
+            text.text = name;
         }
-        //slider.minValue = min;
-        //slider.maxValue = max;
-    }
-
-    private void Start()
-    {
-        //slider.onValueChanged.AddListener(UpdateValue);
     }
 
     void Update()
@@ -36,6 +28,5 @@ public class TextUI : MonoBehaviour
     void UpdateValue(string value)
     {
         data.value = value;
-        text.text = value.ToString();
     }
 }

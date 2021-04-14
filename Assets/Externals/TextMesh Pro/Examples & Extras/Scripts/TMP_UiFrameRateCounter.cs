@@ -69,17 +69,17 @@ namespace TMPro.Examples
             if (timeNow > m_LastInterval + UpdateInterval)
             {
                 // display two fractional digits (f2 format)
-                float fps = m_Frames / (timeNow - m_LastInterval);
-                float ms = 1000.0f / Mathf.Max(fps, 0.00001f);
+                float fpsText = m_Frames / (timeNow - m_LastInterval);
+                float ms = 1000.0f / Mathf.Max(fpsText, 0.00001f);
 
-                if (fps < 30)
+                if (fpsText < 30)
                     htmlColorTag = "<color=yellow>";
-                else if (fps < 10)
+                else if (fpsText < 10)
                     htmlColorTag = "<color=red>";
                 else
                     htmlColorTag = "<color=green>";
 
-                m_TextMeshPro.SetText(htmlColorTag + fpsLabel, fps, ms);
+                m_TextMeshPro.SetText(htmlColorTag + fpsLabel, fpsText, ms);
 
                 m_Frames = 0;
                 m_LastInterval = timeNow;
