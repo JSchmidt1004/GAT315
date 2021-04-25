@@ -5,7 +5,10 @@ using UnityEngine;
 public class World : MonoBehaviour
 {
     public BoolData simulate;
+    public BoolData collision;
+    public BoolData wrap;
     public FloatData gravity;
+    public FloatData gravitation;
     public FloatData fixedFPS;
     public StringData fpsText;
 
@@ -17,6 +20,7 @@ public class World : MonoBehaviour
 
     public float fixedDeltaTime { get { return 1.0f / fixedFPS.value; } }
 
+    Vector2 size;
     float timeAccumulator = 0;
     float fps = 0;
     float fpsAverage = 0;
@@ -25,6 +29,7 @@ public class World : MonoBehaviour
     void Awake()
     {
         instance = this;
+        size = Camera.main.ViewportToWorldPoint(Vector2.one);
     }
 
     void Update()
@@ -36,15 +41,30 @@ public class World : MonoBehaviour
         fpsText.value = string.Format("FPS: {0:F}", fpsAverage);
 
         timeAccumulator += Time.deltaTime;
+        GravitationalForce.ApplyForce(bodies, gravitation.value);
 
         while (timeAccumulator > fixedDeltaTime)
         {
             bodies.ForEach(body => body.Step(fixedDeltaTime));
             bodies.ForEach(body => Integrator.SemiImplicitEuler(body, fixedDeltaTime));
 
+            bodies.ForEach(body => body.shape.color = Color.white);
+
+            if (collision)
+            {
+                Collision.CreateContacts(bodies, out List<Contact> contacts);
+                contacts.ForEach(contact => { contact.bodyA.shape.color = Color.red; contact.bodyB.shape.color = Color.red; });
+                ContactSolver.Resolve(contacts);
+            }
+
             timeAccumulator -= fixedDeltaTime;
         }
-        
+
+        if(wrap)
+        {
+            bodies.ForEach(body => body.position = Utilities.Wrap(body.position, -size, size)); 
+        }
+
         bodies.ForEach(body => body.force = Vector2.zero);
         bodies.ForEach(body => body.acceleration = Vector2.zero);
     }
