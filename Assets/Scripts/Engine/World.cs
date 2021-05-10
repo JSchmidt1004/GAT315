@@ -18,6 +18,7 @@ public class World : MonoBehaviour
     public Vector2 Gravity { get { return new Vector2(0, gravity.value); } }
     public List<Body> bodies { get; set; } = new List<Body>();
     public List<Spring> springs { get; set; } = new List<Spring>();
+    public List<Force> forces { get; set; } = new List<Force>();
 
     public float fixedDeltaTime { get { return 1.0f / fixedFPS.value; } }
 
@@ -33,23 +34,6 @@ public class World : MonoBehaviour
         size = Camera.main.ViewportToWorldPoint(Vector2.one);
     }
 
-    void Start()
-    {
-        Object[] tempBodies = FindObjectsOfType(typeof(Body));
-        foreach (Body body in tempBodies)
-        {
-            Shape box = body.GetComponent<BoxShape>();
-            Shape circle = body.GetComponent<CircleShape>();
-            body.shape = (circle != null) ? circle : box;
-            bodies.Add(body);
-        }
-        //Object[] tempSprings = FindObjectsOfType(typeof(Spring));
-        //foreach (Spring spring in tempSprings)
-        //{
-        //    springs.Add(spring);
-        //}
-    }
-
     void Update()
     {
         springs.ForEach(spring => spring.Draw());
@@ -60,6 +44,7 @@ public class World : MonoBehaviour
         fpsText.value = string.Format("FPS: {0:F}", fpsAverage);
 
         GravitationalForce.ApplyForce(bodies, gravitation.value);
+        forces.ForEach(force => bodies.ForEach(body => force.ApplyForce(body)));
         springs.ForEach(spring => spring.ApplyForce());
 
         timeAccumulator += Time.deltaTime;
